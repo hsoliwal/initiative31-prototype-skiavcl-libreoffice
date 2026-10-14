@@ -1,3 +1,21 @@
+# Initiative 31: explore the VCL extraction prototype
+
+**A guided entry into the LibreOffice-side experiment for reusing VCL with SWT.** This is the public `hsoliwal` fork of [swt-initiative31/prototype-skiavcl-libreoffice](https://github.com/swt-initiative31/prototype-skiavcl-libreoffice), whose source repository is [LibreOffice/core](https://github.com/LibreOffice/core).
+
+| Start with… | If you want… |
+| --- | --- |
+| [Prototype field guide](docs/fork-guide/START_HERE.md) | Context, provenance, branch selection, and a source map |
+| [Quick start and command cheat sheet](docs/fork-guide/CHEATSHEET.md) | Safe source inspection and build preparation |
+| [Examples and troubleshooting](docs/fork-guide/EXAMPLES.md) | A walkthrough of VCL, UNO, and the experimental bridge |
+
+**Choose the right branch:** `master` is the inherited LibreOffice baseline. The actual Initiative 31 extraction experiments are on [`vcl-4-swt`](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/tree/vcl-4-swt), including `vcl4swt/` and `VclUnoSwt/`. Those directories are not part of this default-branch baseline.
+
+This is historical prototype research, not a packaged standalone VCL toolkit, supported SWT replacement, or current LibreOffice release. The [public project report](https://github.com/swt-initiative31/documents/blob/main/report/overall_report.md) distinguishes this earlier VCL route from the later custom-widget/Skia demonstrator. The direct parent was archived when checked on 2026-10-14.
+
+The fork's added guides provide navigation, source-based examples, and explicit limitations. The original LibreOffice introduction follows unchanged; its badges, platform baselines, and links describe the inherited snapshot and upstream project, not independently verified support guarantees for this fork.
+
+---
+
 # LibreOffice
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/211/badge.svg)](https://scan.coverity.com/projects/211) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/307/badge)](https://bestpractices.coreinfrastructure.org/projects/307) [![Translation status](https://weblate.documentfoundation.org/widgets/libo_ui-master/-/svg-badge.svg)](https://weblate.documentfoundation.org/engage/libo_ui-master/?utm_source=widget)
 
