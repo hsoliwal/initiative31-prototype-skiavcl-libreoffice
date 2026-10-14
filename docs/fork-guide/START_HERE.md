@@ -87,3 +87,24 @@ The inherited [.gitreview](../../.gitreview) points to LibreOffice Gerrit, and t
 The upstream [LibreOffice contribution guidance](https://wiki.documentfoundation.org/Development/GetInvolved) governs contributions to LibreOffice itself. This fork's documentation does not replace it or authorize submission to a different project.
 
 Retain the original source headers and license material: [COPYING](../../COPYING), [COPYING.LGPL](../../COPYING.LGPL), and [COPYING.MPL](../../COPYING.MPL). A short repository summary is not a substitute for those texts or per-file notices.
+
+## Source-backed reference and remaining coverage
+
+The current documentation baseline is `38f3847c224e4d735a199e596b11b0a1cf9488e5`.
+The earlier `ad8fa1b...` row above remains the historical comparison baseline;
+it is not the revision used for the new complete superproject inventory.
+Experimental contracts remain pinned separately to `19069d4d...`.
+
+| Read next | What it covers |
+| --- | --- |
+| [Build and repository boundary index](MODULE_INDEX.md) | All 150 baseline root directory trees, build aggregate relationships, alternate manifest paths, and the three unexpanded submodule repositories |
+| [Module-definition inventory](MODULE_MANIFESTS.md) | Every one of the 230 baseline `Module_*.mk` paths, with reviewed versus unreviewed status |
+| [Experimental bridge and Java/UNO contracts](PROTOTYPE_CONTRACTS.md) | Native C/JNI entry points, registered and unregistered demonstrations, selected Java namespace contracts, and concrete lifecycle/bootstrap gaps |
+| [Selected inherited VCL and Skia contracts](VCL_SKIA_CONTRACTS.md) | Reference/disposal ownership, stateful renderer selection, resource/failure effects, and test skip conditions |
+| [Coverage and verification boundary](COVERAGE.md) | Exact revisions/counts, every remaining boundary category, and unexecuted build/runtime checks |
+
+The inventory is complete for the baseline superproject's tracked paths, not
+for every package's meaning. Most inherited module/API bodies, the three gitlink
+repositories, and downloaded dependency sources remain unreviewed. No build,
+GUI behavior, SWT compatibility, or M3 implementation is certified by these
+references.
