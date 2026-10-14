@@ -102,3 +102,36 @@ For a runtime report, record the selected VCL backend and Skia settings. The inh
 - [ ] Review the changed file list; keep documentation changes separate from build/source changes.
 
 The source links and command entry points were inspected during documentation authoring. Native compilation, GUI execution, and cross-platform behavior were not run or certified by this documentation change.
+
+## Preserve both snapshots during an investigation
+
+Before comparing the default branch and the experiment, save the exact commit
+IDs after the fetch shown above. This avoids a later branch update changing the
+meaning of your notes:
+
+```sh
+baseline=$(git rev-parse origin/master)
+experiment=$(git rev-parse HEAD)
+printf 'Baseline: %s\nExperiment: %s\n' "$baseline" "$experiment"
+git diff --name-status "$baseline" "$experiment" -- vcl4swt VclUnoSwt autogen.input
+git diff "$baseline" "$experiment" -- vcl4swt/Library_vcl4swt.mk
+```
+
+Run this from the experiment checkout after fetching `origin/master`; inspect
+the printed IDs rather than assuming either branch still matches the historical
+[branch map](START_HERE.md#the-branch-map-matters). The comparison uses two
+endpoints and therefore does not require a merge base. It compares only the
+listed paths, not the complete experimental change set.
+
+For build investigation, also compare the registration files mentioned above
+without altering the checkout:
+
+```sh
+git diff "$baseline" "$experiment" -- Repository.mk RepositoryModule_build.mk RepositoryModule_host.mk
+```
+
+Keep the commit IDs, configure options, and build outcome together in the
+[example evidence note](EXAMPLES.md#example-2-inspect-what-the-extraction-bridge-actually-exports).
+A matching library declaration or an empty filtered diff is not proof that a
+target was configured, compiled, or exercised successfully. These commands do
+not switch branches, merge upstream changes, or modify source files.
