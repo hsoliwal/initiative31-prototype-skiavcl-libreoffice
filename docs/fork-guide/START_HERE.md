@@ -71,6 +71,13 @@ All links below are pinned to `19069d4d9992840913d2c085856a9af02420dc65` so they
 | [VclUnoSwt/readme.txt](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/VclUnoSwt/readme.txt) | Historical Java example instructions and a stated position/size issue |
 | [autogen.input](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/autogen.input) | Experiment configuration: `--enable-dbgutil` and `--enable-odk` |
 
+## Continue with a focused investigation
+
+- For native lifetime or JNI questions, follow the [bridge-lifecycle reading exercise](EXAMPLES.md#example-4-review-lifetime-assumptions-before-calling-the-bridge)
+- For test selection, use the [test-source map](CHEATSHEET.md#test-source-map-and-coverage-boundary) and distinguish the demo executable from assertion-based coverage
+- For the SWT side of the earlier VCL experiment, start with [`swt-initiative31/prototype-skiavcl`](https://github.com/swt-initiative31/prototype-skiavcl) and the [Skia/VCL assessment](https://github.com/swt-initiative31/documents/blob/main/results/skia_vcl.md); do not assume this LibreOffice tree contains the Java SWT implementation
+- For the later custom-widget demonstrator, follow [`prototype-skija`](https://github.com/swt-initiative31/prototype-skija) and its own setup/platform limitations
+
 ## Contributing and licensing
 
 Keep a change narrowly scoped and state its target branch. A guide correction belongs on this fork's documentation branch; a claim about the prototype should identify the experiment revision and supporting public evidence. A source fix needs its own build and runtime verification.
