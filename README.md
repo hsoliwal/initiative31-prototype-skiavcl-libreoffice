@@ -14,6 +14,72 @@ This is historical prototype research, not a packaged standalone VCL toolkit, su
 
 The fork's added guides provide navigation, source-based examples, and explicit limitations. The original LibreOffice introduction follows unchanged; its badges, platform baselines, and links describe the inherited snapshot and upstream project, not independently verified support guarantees for this fork.
 
+<!-- fork-homepage:start -->
+## What you can learn here
+
+This tree helps answer a concrete question: what would it take to reuse LibreOffice's windowing and widget infrastructure behind an SWT-facing integration? Start with the inherited VCL architecture, then inspect the experiment's native bridge and Java/UNO examples. The surrounding office-suite code is substantial because the prototype has dependencies on that environment; it is not a small standalone widget SDK.
+
+The fork's contribution is documentation and navigation. The extraction code is inherited from Initiative 31, and the final custom-widget/Skia demonstrator belongs to a different research route. Neither the documentation nor a demo target establishes a supported SWT implementation, cross-platform parity, or a verified M3 integration.
+
+## Vocabulary and source layers
+
+| Concept | Meaning / starting point |
+| --- | --- |
+| VCL | LibreOffice's Visual Class Library: windows, widgets, platform abstraction, and rendering facilities |
+| Skia | A rendering backend; it does not replace widget lifecycle or event handling |
+| UNO | LibreOffice's component/service model, also used in the Java control experiments |
+| JNI | The Java/native call boundary explored by the bridge |
+| Bootstrap | Establishing the component context, service factory, and VCL state before creating a window |
+| Event loop | Processing GUI work while the application is running; ownership and shutdown matter |
+| Disposal | Explicit object/resource cleanup, not simply losing a reference |
+
+The [selected VCL/Skia contracts](docs/fork-guide/VCL_SKIA_CONTRACTS.md) explain these state and ownership boundaries. The [experimental contracts](docs/fork-guide/PROTOTYPE_CONTRACTS.md) distinguish actual native/Java entry points from unimplemented or unverified behavior.
+
+## Quick start: inspect the experiment without a full build
+
+Reading the [field guide](docs/fork-guide/START_HERE.md) online requires no setup. For a minimal Git inspection of the experimental branch, use a separate directory:
+
+```sh
+git clone --filter=blob:none --depth 1 --single-branch --branch vcl-4-swt --no-checkout \
+  https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice.git initiative31-vcl-experiment
+cd initiative31-vcl-experiment
+git rev-parse HEAD
+git ls-tree --name-only HEAD vcl4swt VclUnoSwt
+git show HEAD:vcl4swt/src/api/swtapi.cxx
+git show HEAD:VclUnoSwt/readme.txt
+```
+
+The partial clone defers file downloads where supported; `git show` may fetch the requested blobs. `--no-checkout` leaves source files out of the working tree, so use the shown Git object commands rather than expecting files on disk. This branch does not contain the new default-branch reader guides; keep them open online. Commands inspect the current branch tip, so record the printed commit and compare it with the guide's pinned historical experiment before drawing conclusions.
+
+Native compilation requires a configured LibreOffice build environment and the matching historical dependencies. Follow the branch-specific makefiles and the preserved build guidance below only after choosing the correct revision. No native build, GUI launch, or platform test was executed for this homepage update.
+
+## Worked example: trace a window's lifetime
+
+In the baseline, the small VCL window example initializes a UNO context and process service factory, initializes VCL, creates and shows a window, enters the event loop, then disposes the window and tears the environment down. In the experiment, inspect `show_minvcl_window()` and the button/calendar functions in `swtapi.cxx` for the same responsibilities.
+
+The useful review questions are: who owns the event loop, when is the shared window valid, which thread may call the bridge, and which path releases resources? At the guide's reviewed historical snapshot, the function named `deinit()` calls initialization logic rather than mirroring shutdown. Treat that as a source-observed lifecycle gap requiring investigation, not a reusable symmetric `init`/`deinit` API. See the [worked lifecycle exercise](docs/fork-guide/EXAMPLES.md) for the exact pinned source.
+
+## Compact inspection cheat sheet
+
+These commands use objects from the experimental checkout above and do not start a GUI.
+
+| Goal | Command / guide |
+| --- | --- |
+| Record the exact source revision | `git rev-parse HEAD` |
+| List bridge API files | `git ls-tree -r --name-only HEAD vcl4swt/src/api` |
+| Inspect native dependencies | `git show HEAD:vcl4swt/Library_vcl4swt.mk` |
+| Inspect module target declarations | `git show HEAD:vcl4swt/Module_vcl4swt.mk` |
+| Read historical Java example setup | `git show HEAD:VclUnoSwt/readme.txt` |
+| Navigate baseline modules | [Build/repository index](docs/fork-guide/MODULE_INDEX.md) |
+| Distinguish declared targets from reviewed behavior | [Module manifest inventory](docs/fork-guide/MODULE_MANIFESTS.md) |
+| See what remains unverified | [Coverage boundary](docs/fork-guide/COVERAGE.md) |
+
+If `vcl4swt` is missing on `master`, that is a branch distinction, not evidence of an incomplete clone. If a demo window opens, record the observed behavior separately from untested layout, focus, input, accessibility, disposal, and platform compatibility. A target named `test` can still be a demonstration without assertions.
+
+**Go deeper:** [field guide and provenance](docs/fork-guide/START_HERE.md) · [full command reference](docs/fork-guide/CHEATSHEET.md) · [examples and troubleshooting](docs/fork-guide/EXAMPLES.md) · inherited [COPYING](COPYING), [LGPL](COPYING.LGPL), and [MPL](COPYING.MPL) notices.
+
+<!-- fork-homepage:end -->
+
 ---
 
 # LibreOffice
