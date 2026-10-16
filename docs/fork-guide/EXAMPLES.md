@@ -88,3 +88,37 @@ For inherited automated-test entry points and configuration caveats, use the [te
 Include a commit-pinned source link, branch, build configuration, environment, exact command or example, expected result, actual result, and the smallest relevant log excerpt. Distinguish a build failure from a launch failure or behavioral mismatch. Never include credentials or private source material.
 
 A documentation PR should state which links and source claims were checked. A runtime claim requires its own reproducible test evidence. The documentation in this directory was source-reviewed; it does not claim a successful native build or GUI test.
+
+## Example 4: diagnose window disposal without guessing ownership
+
+The inherited [lifecycle guide](../../vcl/README.lifecycle.md) distinguishes a null, live, and disposed `VclPtr`. A non-null pointer is therefore not sufficient evidence that its window is still usable.
+
+Start with [minvcl.cxx](../../vcl/workben/minvcl.cxx): the application creates and retains a `WorkWindow`, enters `Execute()`, and calls `disposeAndClear()` after the event loop returns. Then compare the lifecycle guide's two ownership patterns:
+
+| How the child was obtained | Ownership question | Cleanup pattern described by the lifecycle guide |
+| --- | --- | --- |
+| Retrieved from a VclBuilder-managed hierarchy | Does the builder own and dispose it? | Clear the local reference; the builder disposes its hierarchy |
+| Explicitly allocated and owned by the enclosing widget | Is this code responsible for disposal? | Dispose and clear the owned child |
+| Borrowed/raw reference surviving a callback | Can disposal occur during event processing? | Inspect lifetime and reentrancy before accessing it again |
+
+Do not mechanically replace every `clear()` with `disposeAndClear()`. The ownership distinction is the reason for the different operations.
+
+```sh
+git grep -n 'disposeAndClear' -- vcl/workben/minvcl.cxx
+git grep -n 'with live children' -- vcl/source/window/window.cxx
+git grep -n 'disposeBuilder' -- vcl include/vcl
+```
+
+If a debug build reports a parent destroyed with live children, use the lifecycle guide to trace child creation, ownership, and disposal ordering. If a callback touches a disposed window, also inspect timers/events and the [scheduler notes](../../vcl/README.scheduler.md). These are diagnostic leads, not proof that any particular crash has that cause.
+
+A useful review note records the allocation site, owner, retained references, event/callback boundary, disposal site, and whether the failure happened before or after the event loop returned. Keep “source traced” separate from “crash reproduced.”
+
+## Maintaining a guide for two historical branches
+
+1. Keep baseline examples linked to the baseline and experiment-only files linked to their pinned experiment revision.
+2. If a branch advances, compare its new contents before changing the snapshot map in [START_HERE.md](START_HERE.md). Preserve the old snapshot's meaning rather than reusing its commit count.
+3. Verify target registration and configuration before adding a build command to [CHEATSHEET.md](CHEATSHEET.md). A declared library is not proof of a standalone supported package.
+4. When adding a reproduction result, record build configuration, backend, exact revision, expected/actual behavior, and limitations. A window appearing does not settle disposal or API-compatibility questions.
+5. Review new links from the default branch where these guides live. Experiment-only relative links can fail even when the target exists on another branch.
+
+The lifecycle material describes the inherited source's model and transitional history. Reconcile it with the exact code revision you investigate; this exercise does not certify native compilation, GUI execution, or memory safety.
