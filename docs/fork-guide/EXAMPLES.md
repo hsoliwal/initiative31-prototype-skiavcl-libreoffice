@@ -44,6 +44,32 @@ The note names `TextInMainControl.java`, expects a built LibreOffice tree, and p
 
 Compare your findings with the public [Skia/VCL assessment](https://github.com/swt-initiative31/documents/blob/main/results/skia_vcl.md), which separates VCL and UNO achievements and limitations. State which integration path you investigated.
 
+## Example 4: review lifetime assumptions before calling the bridge
+
+Read the bodies in [`swtapi.cxx`](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/vcl4swt/src/api/swtapi.cxx), not just their exported names:
+
+- `show_minvcl_window()` creates the component context, installs the service factory, initializes VCL, runs the application, and then performs shutdown
+- `TheApplication::Main()` assigns the shared `topWin`, calls `Execute()`, and disposes its window after the event loop exits
+- `add_button()` and `add_calendar()` use that shared window and explicitly acquire the VCL yield mutex
+- The function named `deinit()` does **not** mirror the shutdown in `show_minvcl_window()` at this snapshot: its body creates a context and calls `InitVCL()`
+
+These source observations are a reason to review call order, thread ownership, and disposal before building a caller. They do not establish a supported `init()`/`deinit()` lifecycle or safe arbitrary calls from Java threads. This guide records the behavior found in the historical source; it does not fix or execute it.
+
+A useful investigation separates three questions: which function owns the event loop, when the window pointer is valid, and which path releases VCL/UNO resources. Compare the answers with the inherited [lifecycle notes](../../vcl/README.lifecycle.md) and [scheduler notes](../../vcl/README.scheduler.md). Record an expected sequence and reproduce it explicitly before claiming the bridge can be reused.
+
+## Example 5: distinguish a demo executable from test coverage
+
+The experimental [`Executable_test-vcl4swt.mk`](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/vcl4swt/Executable_test-vcl4swt.mk) defines an executable linked against `vcl4swt`, VCL, and UNO-related libraries. Its [`test-vcl4swt.cxx`](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/vcl4swt/src/test/test-vcl4swt.cxx) calls `show_minvcl_window()` and returns zero afterward; it does not contain assertions covering SWT behavior.
+
+Therefore:
+
+1. A declared executable is evidence of an intended demonstration entry point
+2. A successful build, if reproduced, establishes compilation/linking for that configuration
+3. An opened window establishes only that observed path in that environment
+4. Layout, events, focus, resizing, disposal, and cross-platform behavior each require explicit checks
+
+For inherited automated-test entry points and configuration caveats, use the [test-source map](CHEATSHEET.md#test-source-map-and-coverage-boundary). A filename containing `test` is not a compatibility test suite.
+
 ## Troubleshooting by symptom
 
 | Symptom | Likely distinction to check | Next step |

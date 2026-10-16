@@ -71,6 +71,13 @@ All links below are pinned to `19069d4d9992840913d2c085856a9af02420dc65` so they
 | [VclUnoSwt/readme.txt](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/VclUnoSwt/readme.txt) | Historical Java example instructions and a stated position/size issue |
 | [autogen.input](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/autogen.input) | Experiment configuration: `--enable-dbgutil` and `--enable-odk` |
 
+## Continue with a focused investigation
+
+- For native lifetime or JNI questions, follow the [bridge-lifecycle reading exercise](EXAMPLES.md#example-4-review-lifetime-assumptions-before-calling-the-bridge)
+- For test selection, use the [test-source map](CHEATSHEET.md#test-source-map-and-coverage-boundary) and distinguish the demo executable from assertion-based coverage
+- For the SWT side of the earlier VCL experiment, start with [`swt-initiative31/prototype-skiavcl`](https://github.com/swt-initiative31/prototype-skiavcl) and the [Skia/VCL assessment](https://github.com/swt-initiative31/documents/blob/main/results/skia_vcl.md); do not assume this LibreOffice tree contains the Java SWT implementation
+- For the later custom-widget demonstrator, follow [`prototype-skija`](https://github.com/swt-initiative31/prototype-skija) and its own setup/platform limitations
+
 ## Contributing and licensing
 
 Keep a change narrowly scoped and state its target branch. A guide correction belongs on this fork's documentation branch; a claim about the prototype should identify the experiment revision and supporting public evidence. A source fix needs its own build and runtime verification.
@@ -80,3 +87,24 @@ The inherited [.gitreview](../../.gitreview) points to LibreOffice Gerrit, and t
 The upstream [LibreOffice contribution guidance](https://wiki.documentfoundation.org/Development/GetInvolved) governs contributions to LibreOffice itself. This fork's documentation does not replace it or authorize submission to a different project.
 
 Retain the original source headers and license material: [COPYING](../../COPYING), [COPYING.LGPL](../../COPYING.LGPL), and [COPYING.MPL](../../COPYING.MPL). A short repository summary is not a substitute for those texts or per-file notices.
+
+## Source-backed reference and remaining coverage
+
+The current documentation baseline is `38f3847c224e4d735a199e596b11b0a1cf9488e5`.
+The earlier `ad8fa1b...` row above remains the historical comparison baseline;
+it is not the revision used for the new complete superproject inventory.
+Experimental contracts remain pinned separately to `19069d4d...`.
+
+| Read next | What it covers |
+| --- | --- |
+| [Build and repository boundary index](MODULE_INDEX.md) | All 150 baseline root directory trees, build aggregate relationships, alternate manifest paths, and the three unexpanded submodule repositories |
+| [Module-definition inventory](MODULE_MANIFESTS.md) | Every one of the 230 baseline `Module_*.mk` paths, with reviewed versus unreviewed status |
+| [Experimental bridge and Java/UNO contracts](PROTOTYPE_CONTRACTS.md) | Native C/JNI entry points, registered and unregistered demonstrations, selected Java namespace contracts, and concrete lifecycle/bootstrap gaps |
+| [Selected inherited VCL and Skia contracts](VCL_SKIA_CONTRACTS.md) | Reference/disposal ownership, stateful renderer selection, resource/failure effects, and test skip conditions |
+| [Coverage and verification boundary](COVERAGE.md) | Exact revisions/counts, every remaining boundary category, and unexecuted build/runtime checks |
+
+The inventory is complete for the baseline superproject's tracked paths, not
+for every package's meaning. Most inherited module/API bodies, the three gitlink
+repositories, and downloaded dependency sources remain unreviewed. No build,
+GUI behavior, SWT compatibility, or M3 implementation is certified by these
+references.

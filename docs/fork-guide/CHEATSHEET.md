@@ -76,6 +76,21 @@ These commands configure and build inherited LibreOffice source, may fetch depen
 
 The historical [Java example note](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/VclUnoSwt/readme.txt) says to build LibreOffice first, add the JAR dependencies from `instdir/program/classes` to the build path, and use `TextInMainControl.java`. It also records a position/size issue. There is no verified universal `java -jar`, Maven, or Gradle launcher to substitute for that setup.
 
+## Test-source map and coverage boundary
+
+Before selecting tests, identify whether you changed inherited VCL behavior, the experimental bridge, or the Java/UNO example. They have different entry points:
+
+| Layer | Source to inspect | What it establishes |
+| --- | --- | --- |
+| Experimental native bridge | [Module targets](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/vcl4swt/Module_vcl4swt.mk), [executable definition](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/vcl4swt/Executable_test-vcl4swt.mk), and [demo main](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/vcl4swt/src/test/test-vcl4swt.cxx) | The module declares `Library_vcl4swt` and `Executable_test-vcl4swt`; the executable opens the minimal-window path |
+| Inherited VCL lifetime tests | [`CppunitTest_vcl_lifecycle.mk`](../../vcl/CppunitTest_vcl_lifecycle.mk) | CppUnit test setup with VCL/UNO libraries, components, and configuration dependencies |
+| Inherited Skia tests | [`CppunitTest_vcl_skia.mk`](../../vcl/CppunitTest_vcl_skia.mk) and [`Module_vcl.mk`](../../vcl/Module_vcl.mk) | A non-headless VCL test target, registered when `SKIA` is in `BUILD_TYPE` |
+| Java/UNO controls | [Historical example instructions](https://github.com/hsoliwal/initiative31-prototype-skiavcl-libreoffice/blob/19069d4d9992840913d2c085856a9af02420dc65/VclUnoSwt/readme.txt) | A manual example using a built LibreOffice tree, with a recorded position/size limitation |
+
+This is a source map, not a claim that these targets run in every configuration. Follow the selected snapshot's build setup before attempting them. Inherited VCL tests do not certify the experimental SWT bridge or the later Initiative 31 custom-widget demonstrator.
+
+For a runtime report, record the selected VCL backend and Skia settings. The inherited [environment-variable reference](../../vcl/README.vars.md) distinguishes `SAL_USE_VCLPLUGIN` from `SAL_ENABLESKIA` and the `SAL_SKIA` rendering-method selection. Enabling a variable alone does not prove the chosen backend supports or actually used that path. Avoid forcing a denylisted renderer merely to make an example start; diagnose and report the original behavior first.
+
 ## Verification checklist
 
 - [ ] Record the exact branch and commit.
@@ -87,3 +102,36 @@ The historical [Java example note](https://github.com/hsoliwal/initiative31-prot
 - [ ] Review the changed file list; keep documentation changes separate from build/source changes.
 
 The source links and command entry points were inspected during documentation authoring. Native compilation, GUI execution, and cross-platform behavior were not run or certified by this documentation change.
+
+## Preserve both snapshots during an investigation
+
+Before comparing the default branch and the experiment, save the exact commit
+IDs after the fetch shown above. This avoids a later branch update changing the
+meaning of your notes:
+
+```sh
+baseline=$(git rev-parse origin/master)
+experiment=$(git rev-parse HEAD)
+printf 'Baseline: %s\nExperiment: %s\n' "$baseline" "$experiment"
+git diff --name-status "$baseline" "$experiment" -- vcl4swt VclUnoSwt autogen.input
+git diff "$baseline" "$experiment" -- vcl4swt/Library_vcl4swt.mk
+```
+
+Run this from the experiment checkout after fetching `origin/master`; inspect
+the printed IDs rather than assuming either branch still matches the historical
+[branch map](START_HERE.md#the-branch-map-matters). The comparison uses two
+endpoints and therefore does not require a merge base. It compares only the
+listed paths, not the complete experimental change set.
+
+For build investigation, also compare the registration files mentioned above
+without altering the checkout:
+
+```sh
+git diff "$baseline" "$experiment" -- Repository.mk RepositoryModule_build.mk RepositoryModule_host.mk
+```
+
+Keep the commit IDs, configure options, and build outcome together in the
+[example evidence note](EXAMPLES.md#example-2-inspect-what-the-extraction-bridge-actually-exports).
+A matching library declaration or an empty filtered diff is not proof that a
+target was configured, compiled, or exercised successfully. These commands do
+not switch branches, merge upstream changes, or modify source files.
